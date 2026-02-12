@@ -14,12 +14,6 @@
 2. 后端：FastAPI + SQLModel + MongoDB + crewAI
 3. 向量与检索（可选）：Milvus + sentence-transformers
 
-## 界面预览
-
-![登录界面](docs/screenshots/login.png)
-
-![写作界面](docs/screenshots/writer.png)
-
 ## 目录结构说明
 
 **仓库根目录**

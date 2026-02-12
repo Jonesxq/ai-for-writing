@@ -6,6 +6,9 @@
 *.p12
 *.pfx
 
+# Images (do not commit)
+*.png
+
 # Python
 **/__pycache__/
 *.pyc
