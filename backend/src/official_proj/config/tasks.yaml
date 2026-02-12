@@ -1,0 +1,184 @@
+# 1. 故事策划（✅ JSON dict）
+story_planning_task:
+  description: >
+    围绕小说主题 {topic}，设计整体故事走向，
+    明确核心冲突、长期剧情主线，并给出下一章节的写作目标。
+  expected_output: >
+    请严格只输出 JSON（最外层必须是对象），不允许输出数组或多余文字。
+    格式如下：
+    {
+      "story_overview": "整体剧情主线概述",
+      "core_conflicts": [
+        "核心冲突1",
+        "核心冲突2"
+      ],
+      "next_chapter_goal": "下一章节的写作目标"
+    }
+  agent: story_planner
+
+
+# 2. 世界设定（✅ JSON dict）
+world_building_task:
+  description: >
+    根据当前故事策划，构建或补充小说的世界观设定，
+    明确世界规则、力量或科技水平，以及本章节的整体氛围。
+  expected_output: >
+    请严格只输出 JSON（最外层必须是对象），格式如下：
+    {
+      "world_rules": [
+        "规则1",
+        "规则2"
+      ],
+      "tone": "整体基调",
+      "technology_level": "科技或文明水平"
+    }
+  agent: world_builder
+
+
+# 3. 人物设定（✅ JSON dict，包含 characters 数组）
+character_design_task:
+  description: >
+    设计或更新下一章节中涉及的主要人物，
+    明确他们的性格特征、动机、缺陷与成长方向。
+  expected_output: >
+    请严格只输出 JSON（最外层必须是对象），不允许直接输出数组。
+    格式如下：
+    {
+      "characters": [
+        {
+          "name": "角色名",
+          "role": "角色定位",
+          "personality": "性格特征",
+          "motivation": "核心动机",
+          "flaws": "性格或能力缺陷",
+          "growth_arc": "成长弧线"
+        }
+      ]
+    }
+  agent: character_architect
+
+
+# 4. 小说正文（✅ JSON dict，正文放字段里）
+writing_task:
+  description: >
+    基于故事策划、世界观设定、人物设定以及历史剧情回忆，用白话描述，
+    撰写下一章节小说正文，确保剧情连贯、节奏合理。
+    每章节的字数为5000左右，确保内容清晰、结构合理。
+    必须使用白话文写作，避免古风/文言风格；
+    仅当用户主题或世界观明确要求古风时才可使用对应文风。
+  expected_output: >
+    请严格只输出 JSON（最外层必须是对象），不允许直接输出小说文本。
+    格式如下：
+    {
+      "chapter_title": "章节标题（如：第一章 血夜萤火）",
+      "content": "完整章节正文内容，使用自然段落描述"
+    }
+  agent: narrative_writer
+
+
+# 5. 章节评审（✅ JSON dict）
+chapter_review_task:
+  description: >
+    对本章节内容进行评审，重点检查是否跑题或脱离世界观设定，
+    并给出总体质量评分与简短评语。
+  expected_output: >
+    请严格只输出 JSON（最外层必须是对象），不允许输出多余文字。
+    格式如下：
+    {
+      "overall_score": 8,
+      "world_consistency_score": 9,
+      "off_topic": false,
+      "issues": [
+        "问题1",
+        "问题2"
+      ],
+      "summary": "简短评语"
+    }
+  agent: chapter_reviewer
+
+
+# 5. 章节重写（✅ JSON dict）
+chapter_rewrite_task:
+  description: >
+    基于上一任务的评审问题，对本章节进行重写，
+    必须先列出不合格原因，再给出重写后的章节正文。
+    请以评审 issues 为主要依据进行针对性改写。
+    请从上下文中的 writing_task 输出获取原章节内容。
+  expected_output: >
+    请严格只输出 JSON（最外层必须是对象），不允许输出多余文字。
+    格式如下：
+    {
+      "fail_reasons": [
+        "不合格原因1",
+        "不合格原因2"
+      ],
+      "chapter_title": "重写后的章节标题",
+      "content": "重写后的完整章节正文内容"
+    }
+  agent: chapter_reviewer
+
+
+# 6. 章节重写评审（✅ JSON dict）
+chapter_rewrite_review_task:
+  description: >
+    对重写后的章节内容进行评审，重点检查是否跑题或脱离世界观设定，
+    并给出总体质量评分与简短评语。
+    请以 chapter_rewrite_task 输出的 content 为准进行评审。
+  expected_output: >
+    请严格只输出 JSON（最外层必须是对象），不允许输出多余文字。
+    格式如下：
+    {
+      "overall_score": 8,
+      "world_consistency_score": 9,
+      "off_topic": false,
+      "issues": [
+        "问题1",
+        "问题2"
+      ],
+      "summary": "简短评语"
+    }
+  agent: chapter_reviewer
+
+
+# 7. 剧情分析（✅ JSON dict）
+plot_analysis_task:
+  description: >
+    分析本章节小说内容，提取关键事件、重要信息和潜在影响，
+    重点关注对后续剧情有长期影响的内容。
+    若存在 chapter_rewrite_task 输出，请以重写后的 content 为准进行分析；
+    否则以 writing_task 的 content 为准。
+  expected_output: >
+    请严格只输出 JSON（最外层必须是对象），格式如下：
+    {
+      "key_events": [
+        "关键事件1",
+        "关键事件2"
+      ],
+      "consequences": [
+        "可能产生的影响1",
+        "可能产生的影响2"
+      ]
+    }
+  agent: plot_analyst
+
+
+# 8. 记忆更新（✅ JSON dict，包含 states 数组）
+memory_update_task:
+  description: >
+    基于剧情分析结果，更新小说的长期记忆内容，
+    标注必须长期保留的信息和不可被后续剧情违背的设定。
+  expected_output: >
+    请严格只输出 JSON（最外层必须是对象），不允许直接输出数组。
+    格式如下：
+    {
+      "states": [
+        {
+          "character_name": "角色名",
+          "location": "当前位置",
+          "emotion": "当前情绪",
+          "goal": "短期或长期目标",
+          "relationships": {}
+        }
+      ]
+    }
+  agent: memory_keeper
